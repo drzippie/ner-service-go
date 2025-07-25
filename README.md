@@ -117,14 +117,29 @@ curl http://localhost:8080/health
 
 **POST /ner**
 
-Request:
-```json
-{
-  "text": "Juan vive en Madrid y trabaja en Google España."
-}
+The endpoint accepts text input in multiple formats:
+
+**Option 1: JSON Input**
+```bash
+curl -X POST http://localhost:8080/ner \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
 ```
 
-Response:
+**Option 2: URL-encoded Form Data**
+```bash
+curl -X POST http://localhost:8080/ner \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "text=Juan vive en Madrid y trabaja en Google España."
+```
+
+**Option 3: Multipart Form Data**
+```bash
+curl -X POST http://localhost:8080/ner \
+  -F "text=Juan vive en Madrid y trabaja en Google España."
+```
+
+**Response** (same for all input methods):
 ```json
 [
   {
@@ -143,13 +158,6 @@ Response:
     "label": "Google España"
   }
 ]
-```
-
-#### Example with curl:
-```bash
-curl -X POST http://localhost:8080/ner \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
 ```
 
 ### CLI Interface
@@ -266,10 +274,14 @@ docker run -p 8080:8080 -v ./models:/app/models:ro ner-service-go:lite
 
 ### Testing
 ```bash
-# Test API
+# Test API with JSON
 curl -X POST http://localhost:8080/ner \
   -H "Content-Type: application/json" \
   -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
+
+# Test API with form data
+curl -X POST http://localhost:8080/ner \
+  -d "text=María trabaja en Barcelona para Microsoft."
 
 # Test health
 curl http://localhost:8080/health

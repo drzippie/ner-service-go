@@ -31,18 +31,38 @@ func main() {
 
 func handleNER(nerService *ner.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req ner.ExtractRequest
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON format"})
-			return
+		var text string
+		
+		// Try to get text from different sources
+		contentType := c.GetHeader("Content-Type")
+		
+		if contentType == "application/json" || contentType == "application/json; charset=utf-8" {
+			// Handle JSON input
+			var req ner.ExtractRequest
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON format"})
+				return
+			}
+			text = req.Text
+		} else {
+			// Handle form data (application/x-www-form-urlencoded or multipart/form-data)
+			text = c.PostForm("text")
+			
+			// If not found in form data, try to bind as JSON anyway (fallback)
+			if text == "" {
+				var req ner.ExtractRequest
+				if err := c.ShouldBindJSON(&req); err == nil {
+					text = req.Text
+				}
+			}
 		}
 
-		if req.Text == "" {
+		if text == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Text field is required"})
 			return
 		}
 
-		entities, err := nerService.ExtractEntities(req.Text)
+		entities, err := nerService.ExtractEntities(text)
 		if err != nil {
 			log.Printf("Error extracting entities: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to extract entities"})
