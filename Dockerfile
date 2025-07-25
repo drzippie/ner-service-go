@@ -47,6 +47,13 @@ RUN go build -ldflags="-s -w" -o ner-server cmd/server/main.go
 # Build the CLI binary  
 RUN go build -ldflags="-s -w" -o ner-cli cmd/cli/main.go
 
+# Download Spanish MITIE model
+RUN mkdir -p models && \
+    wget https://sourceforge.net/projects/mitie.mirror/files/v0.4/MITIE-models-v0.2-Spanish.zip/download -O models/spanish_model.zip && \
+    unzip models/spanish_model.zip -d models/ && \
+    mv models/MITIE-models/spanish/* models/ 2>/dev/null || true && \
+    rm -rf models/MITIE-models models/spanish_model.zip
+
 # Production stage - minimal runtime image
 FROM debian:bullseye-slim
 
@@ -68,11 +75,9 @@ RUN groupadd -g 1001 appgroup && \
 WORKDIR /app
 RUN chown -R appuser:appgroup /app
 
-# Copy binaries from builder stage
+# Copy binaries and models from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/ner-server /app/ner-cli ./
-
-# Create models directory
-RUN mkdir -p models && chown -R appuser:appgroup models
+COPY --from=builder --chown=appuser:appgroup /app/models ./models
 
 # Switch to non-root user
 USER appuser

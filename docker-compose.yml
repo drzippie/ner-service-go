@@ -12,9 +12,8 @@ services:
       - MITIE_MODEL_PATH=/app/models/ner_model.dat
       - PORT=8080
       - GIN_MODE=release
-    volumes:
-      # Mount local models directory (after downloading models)
-      - ./models:/app/models:ro
+    # Models are now included in the Docker image
+    # No external volume mounting required
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "--timeout=5", "http://localhost:8080/health"]

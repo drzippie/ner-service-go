@@ -238,13 +238,41 @@ make setup          # Full setup (install + download + build)
 
 ## Docker Support
 
-Build and run with Docker:
+### Option 1: Image with Models Included (Recommended)
+Build Docker image with Spanish models included (~539MB):
 ```bash
-# Build image
-docker build -t ner-service .
+# Build image with models
+docker build --platform linux/amd64 -t ner-service-go .
 
-# Run with docker-compose
+# Run directly
+docker run -p 8080:8080 ner-service-go
+
+# Or run with docker-compose
 docker-compose up
+```
+
+### Option 2: Lightweight Image + External Models
+For smaller images, mount models as external volume:
+```bash
+# Download models locally first
+make download-model
+
+# Build without models (modify Dockerfile to remove model download)
+docker build --platform linux/amd64 -t ner-service-go:lite .
+
+# Run with volume mount
+docker run -p 8080:8080 -v ./models:/app/models:ro ner-service-go:lite
+```
+
+### Testing
+```bash
+# Test API
+curl -X POST http://localhost:8080/ner \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
+
+# Test health
+curl http://localhost:8080/health
 ```
 
 ## License
