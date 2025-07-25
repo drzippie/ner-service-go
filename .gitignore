@@ -30,3 +30,14 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# NER Service specific
+# Compiled binaries
+ner-server
+ner-cli
+main
+
+# Model files (large files - download separately)
+models/*.dat
+models/*.zip
+models/MITIE-models/

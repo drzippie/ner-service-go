@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export:*)",
+      "Bash(go mod init:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(go get:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
