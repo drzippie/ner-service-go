@@ -1,0 +1,42 @@
+# Git files
+.git
+.gitignore
+
+# Compiled binaries (will be built inside container)
+ner-server
+ner-cli
+main
+
+# Model files (mounted as volume or downloaded in container)
+models/*.dat
+models/*.zip
+
+# Documentation
+*.md
+LICENSE
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*_test.go
+test/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Node.js (if any frontend)
+node_modules/
+npm-debug.log
+
+# Python (if any scripts)
+__pycache__/
+*.pyc
