@@ -6,7 +6,19 @@
       "Bash(mkdir:*)",
       "Bash(touch:*)",
       "Bash(go get:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(docker build:*)",
+      "Bash(docker run:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker rm:*)",
+      "Bash(./ner-cli:*)",
+      "Bash(go run:*)",
+      "Bash(make:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(go test:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

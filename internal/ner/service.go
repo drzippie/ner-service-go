@@ -54,14 +54,14 @@ func (s *Service) ExtractEntities(text string) ([]Entity, error) {
 func mapTagToStandardFormat(mitieTag int) string {
 	switch mitieTag {
 	case 0:
-		return "LOCATION"    // LOC
+		return "LOCATION" // LOC
 	case 1:
 		return "ORGANIZATION" // ORG
 	case 2:
-		return "PERSON"       // PER
+		return "PERSON" // PER
 	case 3:
-		return "MISC"         // MISC
+		return "MISC" // MISC
 	default:
-		return "MISC"         // Default to MISC
+		return "MISC" // Default to MISC
 	}
 }

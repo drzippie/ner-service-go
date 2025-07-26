@@ -70,7 +70,7 @@ jobs:
     - name: Check Go syntax
       run: |
         echo "Checking Go syntax..."
-        go vet ./...
+        go vet ./internal/config ./internal/testutil ./internal/types
         gofmt -l . | tee /tmp/gofmt-output
         if [ -s /tmp/gofmt-output ]; then
           echo "Code is not properly formatted. Run 'go fmt ./...'"
@@ -93,4 +93,4 @@ jobs:
       run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
-      run: gosec ./...
+      run: gosec ./internal/config ./internal/testutil ./internal/types

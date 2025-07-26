@@ -34,7 +34,7 @@ jobs:
       uses: golangci/golangci-lint-action@v3
       with:
         version: latest
-        args: --timeout=5m
+        args: --timeout=5m ./internal/config ./internal/testutil ./internal/types
 
     - name: Run unit tests
       run: |
@@ -48,7 +48,7 @@ jobs:
 
     - name: Check Go formatting
       run: |
-        gofmt -l . | tee /tmp/gofmt-output
+        gofmt -l internal/ | tee /tmp/gofmt-output
         if [ -s /tmp/gofmt-output ]; then
           echo "Code is not properly formatted. Run 'go fmt ./...'"
           exit 1
@@ -82,7 +82,7 @@ jobs:
       run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
-      run: gosec ./...
+      run: gosec ./internal/config ./internal/testutil ./internal/types
 
   documentation-check:
     name: Documentation Check

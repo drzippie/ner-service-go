@@ -165,9 +165,9 @@ func TestExtractResponse_EmptyEntities(t *testing.T) {
 
 func TestEntityValidation(t *testing.T) {
 	tests := []struct {
-		name     string
-		entity   Entity
-		isValid  bool
+		name    string
+		entity  Entity
+		isValid bool
 	}{
 		{
 			name: "Valid PERSON entity",
@@ -228,11 +228,11 @@ func TestEntityValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hasRequiredFields := tt.entity.Tag != "" && tt.entity.Label != "" && tt.entity.Score != ""
-			
+
 			if tt.isValid && !hasRequiredFields {
 				t.Errorf("Entity should be valid but is missing required fields: %+v", tt.entity)
 			}
-			
+
 			if !tt.isValid && hasRequiredFields {
 				t.Errorf("Entity should be invalid but has all required fields: %+v", tt.entity)
 			}
@@ -255,13 +255,13 @@ func TestExtractRequest_TextValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			request := ExtractRequest{Text: tt.text}
-			
+
 			hasValidText := len(request.Text) > 0 && len(strings.TrimSpace(request.Text)) > 0
-			
+
 			if tt.isValid && !hasValidText {
 				t.Errorf("Request should be valid but text is invalid: '%s'", tt.text)
 			}
-			
+
 			if !tt.isValid && hasValidText {
 				t.Errorf("Request should be invalid but text is valid: '%s'", tt.text)
 			}
