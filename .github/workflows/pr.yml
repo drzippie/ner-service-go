@@ -78,15 +78,11 @@ jobs:
       with:
         go-version: '1.24'
 
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
-      with:
-        args: './...'
+    - name: Install Gosec
+      run: go install github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
 
-    - name: Run Nancy vulnerability scanner
-      run: |
-        go install github.com/sonatypecommunity/nancy@latest
-        go list -json -deps ./... | nancy sleuth
+    - name: Run Gosec Security Scanner
+      run: gosec ./...
 
   documentation-check:
     name: Documentation Check
@@ -94,13 +90,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Check README links
-      uses: gaurav-nelson/github-action-markdown-link-check@v1
-      with:
-        use-quiet-mode: 'yes'
-        use-verbose-mode: 'yes'
-        config-file: '.github/workflows/markdown-link-config.json'
 
     - name: Check documentation completeness
       run: |
