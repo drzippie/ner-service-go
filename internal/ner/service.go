@@ -42,7 +42,7 @@ func (s *Service) ExtractEntities(text string) ([]Entity, error) {
 	result := make([]Entity, len(entities))
 	for i, entity := range entities {
 		result[i] = Entity{
-			Tag:   mapTagToStandardFormat(entity.TagString),
+			Tag:   mapTagToStandardFormat(entity.Tag),
 			Score: strconv.FormatFloat(entity.Score, 'f', 6, 64),
 			Label: entity.Name,
 		}
@@ -51,17 +51,17 @@ func (s *Service) ExtractEntities(text string) ([]Entity, error) {
 	return result, nil
 }
 
-func mapTagToStandardFormat(mitieTag string) string {
+func mapTagToStandardFormat(mitieTag int) string {
 	switch mitieTag {
-	case "PERSON":
-		return "PERSON"
-	case "LOCATION":
-		return "LOCATION"
-	case "ORGANIZATION":
-		return "ORGANIZATION"
-	case "MISC":
-		return "MISC"
+	case 0:
+		return "LOCATION"    // LOC
+	case 1:
+		return "ORGANIZATION" // ORG
+	case 2:
+		return "PERSON"       // PER
+	case 3:
+		return "MISC"         // MISC
 	default:
-		return "PLACE"
+		return "MISC"         // Default to MISC
 	}
 }

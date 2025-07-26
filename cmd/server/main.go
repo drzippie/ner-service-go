@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"ner-service-go/internal/config"
 	"ner-service-go/internal/ner"
+	"ner-service-go/internal/version"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/health", handleHealth)
+	r.GET("/version", handleVersion)
 	r.POST("/ner", handleNER(nerService))
 
 	log.Printf("Server starting on port %s", cfg.Port)
@@ -78,4 +80,9 @@ func handleHealth(c *gin.Context) {
 		"status": "healthy",
 		"service": "ner-service-go",
 	})
+}
+
+func handleVersion(c *gin.Context) {
+	buildInfo := version.GetBuildInfo()
+	c.JSON(http.StatusOK, buildInfo)
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"ner-service-go/internal/config"
 	"ner-service-go/internal/ner"
+	"ner-service-go/internal/version"
 )
 
 var (
@@ -29,6 +30,17 @@ func main() {
 	rootCmd.Flags().StringVarP(&modelPath, "model", "m", "", "Path to MITIE model file (default: models/ner_model.dat)")
 	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "Input file path (if not provided, reads from stdin)")
 	rootCmd.Flags().BoolVarP(&outputJSON, "json", "j", false, "Output in JSON format")
+
+	// Add version command
+	var versionCmd = &cobra.Command{
+		Use:   "version",
+		Short: "Print the version number",
+		Run: func(cmd *cobra.Command, args []string) {
+			buildInfo := version.GetBuildInfo()
+			fmt.Printf("%s version %s\n", buildInfo.Service, buildInfo.Version)
+		},
+	}
+	rootCmd.AddCommand(versionCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
