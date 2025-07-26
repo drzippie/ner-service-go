@@ -1,0 +1,95 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run unit tests
+      run: |
+        echo "Running unit tests (no CGO dependencies)..."
+        go test -v ./internal/config ./internal/testutil ./internal/types
+
+    - name: Run tests with coverage
+      run: |
+        go test -v -coverprofile=coverage.out ./internal/config ./internal/testutil ./internal/types
+        go tool cover -func=coverage.out
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.out
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Verify Go modules
+      run: go mod verify
+
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Check Go syntax
+      run: |
+        echo "Checking Go syntax..."
+        go vet ./...
+        gofmt -l . | tee /tmp/gofmt-output
+        if [ -s /tmp/gofmt-output ]; then
+          echo "Code is not properly formatted. Run 'go fmt ./...'"
+          exit 1
+        fi
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Run Gosec Security Scanner
+      uses: securecodewarrior/github-action-gosec@master
+      with:
+        args: './...'

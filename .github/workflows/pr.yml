@@ -1,0 +1,130 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quick-tests:
+    name: Quick Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Run Go linting
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest
+        args: --timeout=5m
+
+    - name: Run unit tests
+      run: |
+        echo "Running unit tests (no CGO dependencies)..."
+        go test -v ./internal/config ./internal/testutil ./internal/types
+
+    - name: Check Go modules
+      run: |
+        go mod tidy
+        git diff --exit-code go.mod go.sum
+
+    - name: Check Go formatting
+      run: |
+        gofmt -l . | tee /tmp/gofmt-output
+        if [ -s /tmp/gofmt-output ]; then
+          echo "Code is not properly formatted. Run 'go fmt ./...'"
+          exit 1
+        fi
+
+  docker-lint:
+    name: Docker Lint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Hadolint (Docker linting)
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Run Gosec Security Scanner
+      uses: securecodewarrior/github-action-gosec@master
+      with:
+        args: './...'
+
+    - name: Run Nancy vulnerability scanner
+      run: |
+        go install github.com/sonatypecommunity/nancy@latest
+        go list -json -deps ./... | nancy sleuth
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check README links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        config-file: '.github/workflows/markdown-link-config.json'
+
+    - name: Check documentation completeness
+      run: |
+        echo "Checking for required documentation files..."
+        
+        required_files=("README.md" "TESTING.md" "CLAUDE.md" "LICENSE")
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Missing required file: $file"
+            exit 1
+          else
+            echo "✅ Found: $file"
+          fi
+        done
+        
+        echo "Checking README sections..."
+        if ! grep -q "## Features" README.md; then
+          echo "❌ README missing Features section"
+          exit 1
+        fi
+        
+        if ! grep -q "## Quick Start" README.md; then
+          echo "❌ README missing Quick Start section"  
+          exit 1
+        fi
+        
+        echo "✅ Documentation check passed"

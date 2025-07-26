@@ -20,7 +20,7 @@ CLI_BINARY=ner-cli
 SERVER_DIR=cmd/server
 CLI_DIR=cmd/cli
 
-.PHONY: all build clean test deps server cli
+.PHONY: all build clean test test-unit test-coverage test-verbose deps server cli
 
 all: deps build
 
@@ -42,7 +42,18 @@ clean:
 	rm -f $(CLI_BINARY)
 
 test:
-	$(GOTEST) -v ./...
+	$(GOTEST) -v ./internal/config ./internal/testutil ./internal/types
+
+test-unit:
+	$(GOTEST) -v -short ./internal/config ./internal/testutil ./internal/types
+
+test-coverage:
+	$(GOTEST) -v -coverprofile=coverage.out ./internal/config ./internal/testutil ./internal/types
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report generated: coverage.html"
+
+test-verbose:
+	$(GOTEST) -v -count=1 ./internal/config ./internal/testutil ./internal/types
 
 run-server:
 	CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" $(GOCMD) run $(SERVER_DIR)/main.go
