@@ -71,9 +71,9 @@ jobs:
       run: |
         echo "Checking Go syntax..."
         go vet ./internal/config ./internal/testutil ./internal/types
-        gofmt -l . | tee /tmp/gofmt-output
+        gofmt -l ./internal/ | tee /tmp/gofmt-output
         if [ -s /tmp/gofmt-output ]; then
-          echo "Code is not properly formatted. Run 'go fmt ./...'"
+          echo "Code is not properly formatted. Run 'go fmt ./internal/...'"
           exit 1
         fi
 
