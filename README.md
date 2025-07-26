@@ -1,6 +1,23 @@
 # NER Service Go
 
+[![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen)](https://github.com/your-repo/ner-service-go/releases)
+[![Go Version](https://img.shields.io/badge/Go-1.24+-blue?logo=go)](https://golang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-drzippie%2Fner--service-blue?logo=docker)](https://hub.docker.com/r/drzippie/ner-service)
+[![Docker Pulls](https://img.shields.io/docker/pulls/drzippie/ner-service)](https://hub.docker.com/r/drzippie/ner-service)
+[![Docker Image Size](https://img.shields.io/docker/image-size/drzippie/ner-service/latest)](https://hub.docker.com/r/drzippie/ner-service)
+[![MITIE](https://img.shields.io/badge/NER-MITIE%20Spanish-orange)](https://github.com/mit-nlp/MITIE)
+
 A Named Entity Recognition (NER) service for Spanish text using MITIE (MIT Information Extraction library). This service provides both CLI and HTTP API interfaces for extracting named entities from Spanish text.
+
+## 🐳 Official Docker Image
+
+**Ready-to-use Docker image**: `drzippie/ner-service:latest`
+
+- ✅ **Spanish MITIE models included** (~539MB)
+- ✅ **Production-ready** with health checks
+- ✅ **Security hardened** (non-root, minimal dependencies)
+- ✅ **Multi-platform** support (linux/amd64)
 
 ## ✅ Status: Fully Working
 
@@ -8,6 +25,18 @@ The application is **fully functional and ready to use**. Both CLI and HTTP serv
 
 ## 🚀 Quick Start
 
+### Using Docker (Recommended)
+```bash
+# Pull and run the pre-built image
+docker run -p 8080:8080 drzippie/ner-service:latest
+
+# Test the API
+curl -X POST http://localhost:8080/ner \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
+```
+
+### Local Development
 ```bash
 # 1. Install dependencies
 brew install go mitie
@@ -32,11 +61,12 @@ curl -X POST http://localhost:8080/ner \
 
 ## Features
 
-- Named Entity Recognition for Spanish text
-- Support for entity types: PERSON, LOCATION, ORGANIZATION, MISC, PLACE
-- CLI interface for command-line usage
-- HTTP API with REST endpoint
-- JSON response format with entity scores
+- **Named Entity Recognition** for Spanish text
+- **Multiple entity types**: PERSON, LOCATION, ORGANIZATION, MISC, PLACE
+- **CLI interface** for command-line usage  
+- **HTTP API** with REST endpoint
+- **JSON response** format with confidence scores
+- **Docker image** available on Docker Hub: [`drzippie/ner-service`](https://hub.docker.com/r/drzippie/ner-service)
 
 ## Prerequisites
 
@@ -246,8 +276,25 @@ make setup          # Full setup (install + download + build)
 
 ## Docker Support
 
-### Option 1: Image with Models Included (Recommended)
-Build Docker image with Spanish models included (~539MB):
+### Pre-built Image (Recommended)
+Use the official Docker image from [Docker Hub](https://hub.docker.com/r/drzippie/ner-service) with Spanish models included (~539MB):
+
+```bash
+# Pull and run from Docker Hub
+docker pull drzippie/ner-service:latest
+docker run -p 8080:8080 drzippie/ner-service:latest
+
+# Or use specific version
+docker run -p 8080:8080 drzippie/ner-service:1.0.0
+
+# With custom port
+docker run -p 3000:3000 -e PORT=3000 drzippie/ner-service:latest
+```
+
+**Available on Docker Hub**: https://hub.docker.com/r/drzippie/ner-service
+
+### Build Your Own Image
+Build Docker image locally with Spanish models included:
 ```bash
 # Build image with models
 docker build --platform linux/amd64 -t ner-service-go .
@@ -259,7 +306,7 @@ docker run -p 8080:8080 ner-service-go
 docker-compose up
 ```
 
-### Option 2: Lightweight Image + External Models
+### Custom Build with External Models
 For smaller images, mount models as external volume:
 ```bash
 # Download models locally first
@@ -272,19 +319,25 @@ docker build --platform linux/amd64 -t ner-service-go:lite .
 docker run -p 8080:8080 -v ./models:/app/models:ro ner-service-go:lite
 ```
 
-### Testing
+### Testing the Docker Image
 ```bash
+# Start the official Docker image
+docker run -d --name ner-service -p 8080:8080 drzippie/ner-service:latest
+
 # Test API with JSON
 curl -X POST http://localhost:8080/ner \
   -H "Content-Type: application/json" \
   -d '{"text": "Juan vive en Madrid y trabaja en Google España."}'
 
-# Test API with form data
+# Test API with form data  
 curl -X POST http://localhost:8080/ner \
   -d "text=María trabaja en Barcelona para Microsoft."
 
-# Test health
+# Test health endpoint
 curl http://localhost:8080/health
+
+# Clean up
+docker stop ner-service && docker rm ner-service
 ```
 
 ## License
